@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="35a3378a-25c0-4b5d-b487-6283f64ce992" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<validation:config name="Validation_Config" doc:name="Validation Config" doc:id="d00264b4-44f3-4a17-9d7f-a5db27b15434" />
+	<http:listener-config name="HTTP_Listener_config1" doc:name="HTTP Listener config" doc:id="93de6df8-b384-45e2-8c47-32b4c45afd76" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+	<http:listener-config name="HTTP_Listener_config2" doc:name="HTTP Listener config" doc:id="96ab483f-5b7b-453b-983e-112a5f9c1fe5" >
+		<http:listener-connection host="0.0.0.0" port="8084" />
+	</http:listener-config>
+	<validation:config name="Validation_Config1" doc:name="Validation Config" doc:id="ccbbb901-bc32-4202-96a7-06f069e33e10" />
+	<validation:config name="Validation_Config4" doc:name="Validation Config" doc:id="ddd6eb9c-08f0-46f4-92e5-c02801bffe21" />
+	<flow name="poc1-validationFlow" doc:id="7c173bde-b4c6-4634-b7e5-9f06f09bffe4" >
+		<http:listener doc:name="Listener" doc:id="36c9c6c9-1190-47a1-8371-141a5a257381" path="/validation" config-ref="HTTP_Listener_config"/>
+		<set-payload value='#[" "]' doc:name='"start"' doc:id="61bcad3a-9ce8-4330-a587-05df7caed23d" />
+		<validation:is-blank-string doc:id="67965e21-b70f-4859-a4f4-3ae893fd6351" config-ref="Validation_Config" value="#[payload]"/>
+		<set-payload value='"end"' doc:name='"end"' doc:id="de1bdcbb-4372-4949-ad3b-f6d169990697" />
+	</flow>
+	<flow name="poc1-validationFlow1" doc:id="d78fa540-5562-4658-8285-847cab3a19ac" >
+		<http:listener doc:name="Listener" doc:id="90ff15c7-598a-4cf7-a4d3-f370d3e349ba" config-ref="HTTP_Listener_config1" path="/child"/>
+		<flow-ref doc:name="child" doc:id="d1aaab2c-00c4-4e11-8677-610e3e8d0b55" name="child"/>
+		<set-payload value='#["parent completed"]' doc:name='"parent completed"' doc:id="f8b46331-7555-4800-9bb3-d8ede5b9cc46" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error continue" doc:id="23204291-15d6-45c8-b7ac-a85f858f7aa3" >
+				<set-payload value='#["parent error"]' doc:name='"parent error"' doc:id="0a5d1183-3365-4cdb-b255-a91f930c83c9" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="child" doc:id="8270d561-9d75-44da-9411-1994d6fdfa6b" >
+		<validation:is-number doc:name="Is number" doc:id="5fbdb78e-cfe4-4256-a2f2-a24fcdc30bd2" config-ref="Validation_Config" value="#[payload]" numberType="INTEGER"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="560f8471-1c97-4c89-8f8d-0f868ce1f0ed" >
+				<set-payload value='#["child error"]' doc:name='"child error"' doc:id="15272c50-8f8f-4869-8131-a2ef4d77db01" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="poc1-validationFlow2" doc:id="d50e04b7-b75f-4799-b671-842b550199c0" >
+		<http:listener doc:name="Listener" doc:id="986293ee-c366-42ef-b6ac-3df3790b9508" config-ref="HTTP_Listener_config2" path="/child1"/>
+		<flow-ref doc:name="Flow Reference" doc:id="0775c3fc-7d08-4a2e-ba09-f56074fe8d9f" name="poc1-chil"/>
+		<set-payload value='#["parent completed"]' doc:name="parent completed" doc:id="be01641e-f2c3-44fa-8a03-c977934ab923" />
+		<error-handler>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="114b5c37-63b4-440c-8be3-acedde2ffc4f" >
+				<set-payload value='#["parent error"]' doc:name="parenterror" doc:id="d8dea245-5dfb-4a5a-be48-dbd9a02c3855" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="poc1-chil" doc:id="e1a28b13-595c-4ebc-aa0e-78ba5a4e5408" >
+		<validation:is-number numberType="INTEGER" doc:name="Is number" doc:id="40c9c5df-140a-4af0-9433-e10012ea2d93" config-ref="Validation_Config4" value="#[payload]" message='#["validation error"]'/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error contin" doc:id="45d50c18-52d6-4f4c-83f4-8d6e802e947f" type="ANY">
+				<set-payload value='#["child error"]' doc:name="child error" doc:id="a97a85ee-6957-4f90-882c-f8622cc6e33d" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>
