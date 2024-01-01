@@ -21,7 +21,7 @@ http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mu
 		<http:listener doc:name="Listener" doc:id="36c9c6c9-1190-47a1-8371-141a5a257381" path="/validation" config-ref="HTTP_Listener_config"/>
 		<set-payload value='#[" "]' doc:name='"start"' doc:id="61bcad3a-9ce8-4330-a587-05df7caed23d" />
 		<validation:is-blank-string doc:id="67965e21-b70f-4859-a4f4-3ae893fd6351" config-ref="Validation_Config" value="#[payload]"/>
-		<set-payload value='"end"' doc:name='"end"' doc:id="de1bdcbb-4372-4949-ad3b-f6d169990697" />
+		<set-payload value='"-------------end--------------"' doc:name='"end"' doc:id="de1bdcbb-4372-4949-ad3b-f6d169990697" />
 	</flow>
 	<flow name="poc1-validationFlow1" doc:id="d78fa540-5562-4658-8285-847cab3a19ac" >
 		<http:listener doc:name="Listener" doc:id="90ff15c7-598a-4cf7-a4d3-f370d3e349ba" config-ref="HTTP_Listener_config1" path="/child"/>
